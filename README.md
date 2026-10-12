@@ -48,3 +48,4 @@ Cap discounts at 10%, plan stock for September–December, bundle high-margin it
 
 ## 📝 Notes
 The dataset is simulated, so the numbers illustrate the analysis method rather than a real company. The workflow can be rerun on the Kaggle Online Retail or Superstore dataset by replacing the CSV and updating column names.
+ ----end of the topic
