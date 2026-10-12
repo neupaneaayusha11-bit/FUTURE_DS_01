@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Sales Performance Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#EAEAEA;--card:#fff;--ink:#252423;--mute:#605E5C;--line:#D2D0CE;--bar:#252423;--yel:#F2C811;--c1:#01B8AA;--c2:#374649;--c3:#FD625E;--c4:#F2C811;--c5:#8AD4EB;--grid:#E1DFDD}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1B1A19;--card:#292827;--ink:#F3F2F1;--mute:#A19F9D;--line:#3B3A39;--grid:#3B3A39;--c2:#8A9BA0}}
+:root[data-theme="dark"]{--bg:#1B1A19;--card:#292827;--ink:#F3F2F1;--mute:#A19F9D;--line:#3B3A39;--grid:#3B3A39;--c2:#8A9BA0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:13px}
+header{background:var(--bar);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:12px;border-bottom:3px solid var(--yel)}
+header b{font-size:16px;font-weight:600}header span{color:#C8C6C4;font-size:12px}
+.wrap{padding:12px 14px;max-width:1400px;margin:auto}
+.slicers{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.sl{background:var(--card);border:1px solid var(--line);padding:8px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sl>label{font-weight:600;margin-right:4px}
+.sl button{border:1px solid var(--line);background:transparent;color:var(--ink);padding:4px 10px;font:inherit;cursor:pointer}
+.sl button.on{background:var(--yel);border-color:var(--yel);color:#252423;font-weight:600}
+.sl button:focus-visible,.reset:focus-visible{outline:2px solid #118DFF;outline-offset:1px}
+.reset{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--ink);padding:6px 12px;font:inherit;cursor:pointer;align-self:stretch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+.k{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--yel);padding:10px 12px}
+.k small{color:var(--mute);display:block}.k strong{font-size:26px;font-weight:600;display:block;margin-top:2px}.k em{font-style:normal;font-size:12px}
+.up{color:#107C10}.dn{color:#D13438}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+.c{background:var(--card);border:1px solid var(--line);padding:10px 12px;min-width:0}
+.c h3{margin:0 0 6px;font-size:13px;font-weight:600}.c h3 small{color:var(--mute);font-weight:400}
+.cv{position:relative;height:230px}
+.s12{grid-column:span 12}.s8{grid-column:span 8}.s6{grid-column:span 6}.s4{grid-column:span 4}
+@media(max-width:900px){.s8,.s6,.s4{grid-column:span 12}}
+ul{margin:0;padding-left:18px;line-height:1.55}
+
+@media(min-width:901px){
+html,body{height:100%}body{display:flex;flex-direction:column;overflow:hidden}
+.wrap{flex:1;display:flex;flex-direction:column;min-height:0;width:100%;max-width:none;padding:8px 12px}
+.slicers{margin-bottom:8px}.sl{padding:5px 8px}.sl button{padding:3px 9px}.reset{padding:3px 12px}
+.kpis{margin-bottom:8px}.k{padding:6px 12px}.k strong{font-size:22px}
+.grid{flex:1;min-height:0;grid-template-rows:1fr 1fr}
+.c{display:flex;flex-direction:column;min-height:0;padding:8px 10px}
+.cv{flex:1;height:auto;min-height:0}
+ul{font-size:12.5px;line-height:1.5;overflow:auto}
+}
+</style></head><body>
+<header><b>Sales Performance Dashboard</b></header>
+<div class="wrap">
+<div class="slicers"><div class="sl" id="sY"><label>Year</label></div><div class="sl" id="sR"><label>Region</label></div><div class="sl" id="sC"><label>Category</label></div><button class="reset" id="rs">Clear filters</button></div>
+<div class="kpis" id="kp"></div>
+<div class="grid">
+<div class="c s6"><h3>Revenue and profit by month</h3><div class="cv"><canvas id="a"></canvas></div></div>
+<div class="c s3"><h3>Revenue by region</h3><div class="cv"><canvas id="b"></canvas></div></div>
+<div class="c s3"><h3>Revenue by category</h3><div class="cv"><canvas id="c"></canvas></div></div>
+<div class="c s4"><h3>Top products by revenue</h3><div class="cv"><canvas id="d"></canvas></div></div>
+<div class="c s4"><h3>Profit margin by discount level</h3><div class="cv"><canvas id="e"></canvas></div></div>
+<div class="c s4"><h3>Key insights</h3><ul>
+<li>Technology brings about half of revenue, but Office Supplies has the best margin (43%).</li>
+<li>Furniture earns only about 2% margin, and 30% discounts turn sales into losses.</li>
+<li>Q4 (Oct–Dec) delivers about a third of yearly sales; plan stock from September.</li>
+<li>South has the lowest margin because of heavy discounting. Cap discounts at 10%.</li></ul></div>
+</div></div>
+<script>
+const DATA=__DATA__;const M=DATA.M,P=DATA.P,D=DATA.D;
+const F={y:0,r:0,c:0};
+const Y=[2023,2024,2025],R=["West","East","South","North"],C=["Technology","Furniture","Office Supplies"];
+const col=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fm=n=>Math.abs(n)>=1e6?(n/1e6).toFixed(2)+"M":Math.abs(n)>=1e3?(n/1e3).toFixed(0)+"K":n.toFixed(0);
+const pc=n=>(n*100).toFixed(1)+"%";
+const sum=(rows,i,f)=>rows.reduce((s,x)=>f(x)?s+x[i]:s,0);
+function slicer(id,items,key){const el=document.getElementById(id);["All",...items].forEach((v,i)=>{const b=document.createElement("button");b.textContent=v;b.dataset.v=i?v:0;b.onclick=()=>{F[key]=i?v:0;draw()};el.appendChild(b)})}
+slicer("sY",Y,"y");slicer("sR",R,"r");slicer("sC",C,"c");
+document.getElementById("rs").onclick=()=>{F.y=F.r=F.c=0;draw()};
+const mY=x=>!F.y||+x[0].slice(0,4)===F.y, mR=x=>!F.r||x[1]===F.r, mC=x=>!F.c||x[2]===F.c;
+const pY=x=>!F.y||x[0]===F.y, pR=x=>!F.r||x[1]===F.r, pC=x=>!F.c||x[2]===F.c;
+Chart.defaults.font.family="Segoe UI,system-ui,Arial";
+const ch={};
+function mk(id,cfg){cfg.options=Object.assign({responsive:true,maintainAspectRatio:false},cfg.options||{});ch[id]=new Chart(document.getElementById(id),cfg)}
+const ax=(extra={})=>Object.assign({grid:{color:col("--grid")},ticks:{color:col("--mute")}},extra);
+function upd(id,labels,datasets,colors){const c=ch[id];c.data.labels=labels;datasets.forEach((d,i)=>{c.data.datasets[i].data=d});if(colors)c.data.datasets[0].backgroundColor=colors;c.update()}
+function draw(){
+ document.querySelectorAll(".slicers button[data-v]").forEach(b=>{const k=b.parentElement.id==="sY"?"y":b.parentElement.id==="sR"?"r":"c";const v=k==="y"&&b.dataset.v!=="0"?+b.dataset.v:(b.dataset.v==="0"?0:b.dataset.v);b.classList.toggle("on",F[k]===v)});
+ const f=x=>mY(x)&&mR(x)&&mC(x);
+ const rev=sum(M,3,f),pro=sum(M,4,f),ord=sum(M,5,f);
+ const yr=(y)=>sum(M,3,x=>+x[0].slice(0,4)===y&&mR(x)&&mC(x));
+ const cy=F.y||2025,py=cy-1,g=py>=2023&&yr(py)?yr(cy)/yr(py)-1:null;
+ const K=[["Total revenue",fm(rev)],["Total profit",fm(pro)],["Profit margin",rev?pc(pro/rev):"–"],["Orders",ord.toLocaleString()],["Avg order value",ord?fm(rev/ord):"–"]];
+ document.getElementById("kp").innerHTML=K.map(k=>`<div class="k"><small>${k[0]}</small><strong>${k[1]}</strong></div>`).join("")+`<div class="k"><small>Revenue growth ${cy} vs ${py}</small><strong class="${g>=0?"up":"dn"}">${g===null?"–":(g>=0?"▲ ":"▼ ")+pc(Math.abs(g))}</strong></div>`;
+ const ms=[...new Set(M.filter(x=>mY(x)).map(x=>x[0]))].sort();
+ upd("a",ms.map(m=>{const[a,b]=m.split("-");return["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+b-1]+" "+a.slice(2)}),[ms.map(m=>sum(M,3,x=>x[0]===m&&mR(x)&&mC(x))),ms.map(m=>sum(M,4,x=>x[0]===m&&mR(x)&&mC(x)))]);
+ const rv=R.map(r=>sum(M,3,x=>mY(x)&&mC(x)&&x[1]===r));
+ upd("b",R,[rv],R.map((r,i)=>!F.r||F.r===r?col("--c"+[1,2,3,4][i]):col("--line")));
+ const cv=C.map(c=>sum(M,3,x=>mY(x)&&mR(x)&&x[2]===c));
+ upd("c",C,[cv],C.map((c,i)=>!F.c||F.c===c?col("--c"+[1,2,3][i]):col("--line")));
+ const pr={};P.filter(x=>pY(x)&&pR(x)&&pC(x)).forEach(x=>pr[x[3]]=(pr[x[3]]||0)+x[4]);
+ const top=Object.entries(pr).sort((a,b)=>b[1]-a[1]).slice(0,8);
+ upd("d",top.map(t=>t[0]),[top.map(t=>t[1])]);
+ const lv=[0,.05,.1,.2,.3];
+ const mg=lv.map(l=>{const rr=sum(D,4,x=>pY(x)&&pR(x)&&pC(x)&&x[3]===l),pp=sum(D,5,x=>pY(x)&&pR(x)&&pC(x)&&x[3]===l);return rr?pp/rr*100:0});
+ upd("e",lv.map(l=>Math.round(l*100)+"%"),[mg],mg.map(v=>v<0?col("--c3"):col("--c1")));
+}
+const tip={callbacks:{label:c=>" "+c.dataset.label+": "+fm(c.parsed.y??c.parsed.x)}};
+mk("a",{type:"line",data:{labels:[],datasets:[{label:"Revenue",data:[],borderColor:col("--c1"),backgroundColor:col("--c1"),tension:.25,pointRadius:2},{label:"Profit",data:[],borderColor:col("--c4"),backgroundColor:col("--c4"),tension:.25,pointRadius:2}]},options:{scales:{x:ax({ticks:{color:col("--mute"),maxTicksLimit:12}}),y:ax({ticks:{color:col("--mute"),callback:fm}})},plugins:{legend:{position:"bottom",labels:{color:col("--ink")}},tooltip:tip}}});
+mk("b",{type:"bar",data:{labels:[],datasets:[{label:"Revenue",data:[],backgroundColor:[]}]},options:{onClick:(e,a)=>{if(a.length){const r=R[a[0].index];F.r=F.r===r?0:r;draw()}},scales:{x:ax(),y:ax({ticks:{color:col("--mute"),callback:fm}})},plugins:{legend:{display:false},tooltip:tip}}});
+mk("c",{type:"bar",data:{labels:[],datasets:[{label:"Revenue",data:[],backgroundColor:[]}]},options:{onClick:(e,a)=>{if(a.length){const c=C[a[0].index];F.c=F.c===c?0:c;draw()}},scales:{x:ax(),y:ax({ticks:{color:col("--mute"),callback:fm}})},plugins:{legend:{display:false},tooltip:tip}}});
+mk("d",{type:"bar",data:{labels:[],datasets:[{label:"Revenue",data:[],backgroundColor:col("--c2")}]},options:{indexAxis:"y",scales:{x:ax({ticks:{color:col("--mute"),callback:fm}}),y:ax()},plugins:{legend:{display:false},tooltip:tip}}});
+mk("e",{type:"bar",data:{labels:[],datasets:[{label:"Margin",data:[],backgroundColor:[]}]},options:{scales:{x:ax({title:{display:true,text:"Discount given",color:col("--mute")}}),y:ax({ticks:{color:col("--mute"),callback:v=>v+"%"}})},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" Margin: "+c.parsed.y.toFixed(1)+"%"}}}}});
+draw();
+</script></body></html>
