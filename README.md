@@ -38,7 +38,7 @@ Result: 5,872 clean rows (see `Cleaning_Log` sheet).
 Cap discounts at 10%, plan stock for September–December, bundle high-margin items with big-ticket products, and add discount-approval rules in the South region.
 
 ## 📈 Dashboard Preview
-C:\Users\DELL\Downloads\FUTURE_DS_01_Sales_Data_Analysis\FUTURE_DS_01\salesdashboard.png**
+![Sales Dashboard Preview](./salesdashboard.png)
 
 ## 📂 Files
 * `Sales_Performance_Dashboard.xlsx` – Excel dashboard, summary tables, insights
