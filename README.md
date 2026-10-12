@@ -38,7 +38,7 @@ Result: 5,872 clean rows (see `Cleaning_Log` sheet).
 Cap discounts at 10%, plan stock for September–December, bundle high-margin items with big-ticket products, and add discount-approval rules in the South region.
 
 ## 📈 Dashboard Preview
-*(Add your screenshot here: `![Dashboard](dashboard.png)`)*
+C:\Users\DELL\Downloads\FUTURE_DS_01_Sales_Data_Analysis\FUTURE_DS_01\salesdashboard.png**
 
 ## 📂 Files
 * `Sales_Performance_Dashboard.xlsx` – Excel dashboard, summary tables, insights
@@ -48,4 +48,3 @@ Cap discounts at 10%, plan stock for September–December, bundle high-margin it
 
 ## 📝 Notes
 The dataset is simulated, so the numbers illustrate the analysis method rather than a real company. The workflow can be rerun on the Kaggle Online Retail or Superstore dataset by replacing the CSV and updating column names.
- ----end of the topic
